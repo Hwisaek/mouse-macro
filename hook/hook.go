@@ -29,12 +29,8 @@ func ActivateMacro() {
 			break
 		}
 
-		x, y := robotgo.Location()
-		dx, dy := rand.Intn(20)-10, rand.Intn(20)-10
-
-		robotgo.Move(x+dx, y+dy)
-
-		time.Sleep(time.Second)
+		robotgo.Scroll(rand.Int()%3-1, rand.Int()%3-1)
+		time.Sleep(time.Second / 10)
 	}
 }
 
