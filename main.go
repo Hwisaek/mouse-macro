@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	hook.InitHook()
+	go hook.InitHook()
 	app.InitApp()
 }
