@@ -1,9 +1,9 @@
 package mouse
 
 import (
-	"awesomeProject/windows"
-	"awesomeProject/windows/monitor"
 	"fmt"
+	"mouse-macro/windows"
+	"mouse-macro/windows/monitor"
 	"unsafe"
 )
 

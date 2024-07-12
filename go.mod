@@ -1,10 +1,11 @@
-module awesomeProject
+module mouse-macro
 
 go 1.22
 
 require (
 	fyne.io/fyne/v2 v2.4.5
 	github.com/go-vgo/robotgo v0.110.1
+	github.com/robotn/gohook v0.41.0
 )
 
 require (

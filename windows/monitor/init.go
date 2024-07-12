@@ -1,8 +1,8 @@
 package monitor
 
 import (
-	"awesomeProject/windows"
 	"fmt"
+	"mouse-macro/windows"
 	"sort"
 	"syscall"
 	"unsafe"
