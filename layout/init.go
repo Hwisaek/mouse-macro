@@ -3,6 +3,7 @@ package layout
 import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/data/binding"
 	"fyne.io/fyne/v2/widget"
 	"github.com/go-vgo/robotgo"
 	"log"
@@ -11,6 +12,8 @@ import (
 	"mouse-macro/windows/mouse"
 	"time"
 )
+
+var ProcessList = binding.BindStringList(&[]string{"Item 1", "Item 2", "Item 3"})
 
 func Init(window fyne.Window) {
 	check := widget.NewCheckWithData("move", state.MoveChecked)
@@ -51,8 +54,21 @@ func Init(window fyne.Window) {
 		}
 	}()
 
-	window.SetContent(container.NewVBox(
-		check,
-	))
+	// StringList 데이터 바인딩 생성
 
+	// List 위젯 생성
+	list := widget.NewListWithData(ProcessList,
+		func() fyne.CanvasObject {
+			return widget.NewLabel("template")
+		},
+		func(i binding.DataItem, o fyne.CanvasObject) {
+			o.(*widget.Label).Bind(i.(binding.String))
+		},
+	)
+
+	box := container.NewVBox(
+		check,
+		list,
+	)
+	window.SetContent(box)
 }
