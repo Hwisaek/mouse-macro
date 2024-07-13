@@ -10,6 +10,11 @@ import (
 )
 
 func main() {
+	if !process.HasAdminPermission() {
+		fmt.Println("This program needs to be run as administrator.")
+		return
+	}
+
 	pid, found := process.GetPid("winmine_(한글).exe")
 	if !found {
 		log.Fatalln("process not found")
@@ -36,14 +41,31 @@ func main() {
 	// 메모리 영역 정보를 저장할 구조체
 	var mbi windows.MemoryBasicInformation
 
-	var targetAddress uintptr = 0x0100579C
+	var targetAddress uintptr = 0x0100579C // 지뢰찾기 시간 메모리값
 
 	// 메모리 주소 범위 순회
-	for addr := startAddress; ; {
+	for addr := startAddress; ; addr = mbi.BaseAddress + mbi.RegionSize {
 		// 메모리 영역 정보 조회
 		err := windows.VirtualQueryEx(handle, addr, &mbi, unsafe.Sizeof(mbi))
 		if err != nil {
 			break // 더 이상 조회할 메모리 영역이 없으면 종료
+		}
+
+		if startAddress == 0 {
+			startAddress = mbi.BaseAddress
+		}
+		endAddress = mbi.BaseAddress
+
+		if addr != mbi.BaseAddress {
+			fmt.Println(addr)
+		}
+
+		switch mbi.Type {
+		case 0x1000000: // MEM_IMAGE: 영역 내의 메모리 페이지가 이미지 섹션의 보기에 매핑됨을 나타냅니다.
+		case 0x40000: // MEM_MAPPED: 영역 내의 메모리 페이지가 섹션 보기에 매핑됨을 나타냅니다.
+		case 0x20000: // MEM_PRIVATE: 지역 내의 메모리 페이지가 프라이빗(즉, 다른 프로세스에서 공유되지 않음)임을 나타냅니다.
+		default:
+			continue
 		}
 
 		if mbi.State == windows.MEM_COMMIT {
@@ -68,13 +90,6 @@ func main() {
 				addr += bytesRead
 			}
 		}
-
-		if startAddress == 0 {
-			startAddress = mbi.BaseAddress
-		}
-
-		addr = mbi.BaseAddress + mbi.RegionSize
-		endAddress = addr
 	}
 
 	// 메모리 순회
@@ -88,11 +103,6 @@ func main() {
 
 	data, _ := memory.ReadMemory(targetAddress)
 	fmt.Println(data)
-
-	if !process.HasAdminPermission() {
-		fmt.Println("This program needs to be run as administrator.")
-		return
-	}
 
 	memory.WriteMemory(targetAddress, 42)
 }
